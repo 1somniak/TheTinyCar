@@ -10,6 +10,11 @@ public class CameraFollow : MonoBehaviour
     [SerializeField] private float translateSpeed;
     [SerializeField] private float rotationSpeed;
 
+    private void Start()
+    {
+        Time.fixedDeltaTime = 1f / 60;
+    }
+
     private void FixedUpdate()
     {
         HandleTranslation();
