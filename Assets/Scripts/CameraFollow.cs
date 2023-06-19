@@ -22,6 +22,7 @@ public class CameraFollow : MonoBehaviour
         Time.fixedDeltaTime = 1f / 60;
         _carController = target.GetComponent<CarController>();
         _offsetBackRight = new Vector3(-offsetBackLeft.x, offsetBackLeft.y, offsetBackLeft.z);
+        offset = offsetStraight;
     }
 
     private void FixedUpdate()
@@ -31,27 +32,26 @@ public class CameraFollow : MonoBehaviour
         HandleRotation();
     }
 
+    private bool _isTurned;
     private void GetOffset()
     {
-        if (!_carController.isGoingForward && _carController.speed >= 0.6f)
+        // if (!_carController.isGoingForward && _carController.speed >= 0.6f)
+        // {
+        //     offset = _carController.horizontalInput switch
+        //     {
+        //         >= 0.5f => _offsetBackRight,
+        //         <= -0.5f => offsetBackLeft,
+        //         _ => offsetBackStraight
+        //     };
+        // }
+        // else
+        //     offset = offsetStraight;
+
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
-            switch (_carController.horizontalInput)
-            {
-                case >= 0.5f:
-                    offset = _offsetBackRight;
-                    break;
-                case <= -0.5f:
-                    offset = offsetBackLeft;
-                    break;
-                default: // quand on recule tout droit
-                    offset = offsetBackStraight;
-                    break;
-            }
+            offset = _isTurned ? offsetStraight : offsetBackStraight;
+            _isTurned = !_isTurned;
         }
-        else
-            offset = offsetStraight;
-        
-        
     }
    
     private void HandleTranslation()

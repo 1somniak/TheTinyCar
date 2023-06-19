@@ -15,6 +15,8 @@ public class CarController : MonoBehaviour
     private float steerAngle;
     private bool isBreaking;
     public float Battery;
+    public bool IsDestroyed { get; set; }
+    
 
     private bool _isGoingForward
     {
@@ -33,7 +35,7 @@ public class CarController : MonoBehaviour
     public bool isGoingForward;
 
     public Vector3 previousPosition;
-    public float speed;
+    public float Speed { get; private set; }
     public double carWidth = 130d;
     public double carHeight = 185d;
 
@@ -62,10 +64,10 @@ public class CarController : MonoBehaviour
     private void Start()
     {
         Time.fixedDeltaTime = 1f / 60;
-        transform.position = new Vector3(500f, 0f, 500f);
-        transform.rotation = Quaternion.Euler(0, 0, 0);
-        previousPosition = new Vector3(500f, 0f, 500f);
+        transform.rotation = Quaternion.Euler(0, 0f, 0);
+        previousPosition = transform.position;
         ChargeBattery();
+        IsDestroyed = false;
     }
 
     private void FixedUpdate()
@@ -77,9 +79,7 @@ public class CarController : MonoBehaviour
         UpdateWheels();
         var position = transform.position;
         GetSpeed(position);
-
         ChangeStrings();
-        
         previousPosition = position;
     }
 
@@ -90,15 +90,15 @@ public class CarController : MonoBehaviour
     
     private void ChangeStrings()
     {
-        strings[10] = $"                       {MyApprox(speed)}";
+        strings[10] = $"                       {MyApprox(Speed)}";
         
         strings[3] = $"FPS: {1f / Time.deltaTime}";
-        Dbug.text = $"00- {strings[0]}\n01- {strings[1]}\n02- {strings[2]}\n03- {strings[3]}\n04- {strings[4]}\n" +
-                    $"05- {strings[5]}\n06- {strings[6]}\n07- {strings[7]}\n08- {strings[8]}\n09- {strings[9]}\n" +
-                    $"10- {strings[10]}\n11- {strings[11]}\n12- {strings[12]}\n13- {strings[13]}\n14- {strings[14]}\n" +
-                    $"15- {strings[15]}\n16- {strings[16]}\n17- {strings[17]}\n18- {strings[18]}\n19- {strings[19]}\n" +
-                    $"20- {strings[20]}\n21- {strings[21]}\n22- {strings[22]}\n23- {strings[23]}\n24- {strings[24]}\n" +
-                    $"25- {strings[25]}\n26- {strings[26]}\n27- {strings[27]}\n28- {strings[28]}\n29- {strings[29]}\n";
+        // Dbug.text = $"00- {strings[0]}\n01- {strings[1]}\n02- {strings[2]}\n03- {strings[3]}\n04- {strings[4]}\n" +
+        //             $"05- {strings[5]}\n06- {strings[6]}\n07- {strings[7]}\n08- {strings[8]}\n09- {strings[9]}\n" +
+        //             $"10- {strings[10]}\n11- {strings[11]}\n12- {strings[12]}\n13- {strings[13]}\n14- {strings[14]}\n" +
+        //             $"15- {strings[15]}\n16- {strings[16]}\n17- {strings[17]}\n18- {strings[18]}\n19- {strings[19]}\n" +
+        //             $"20- {strings[20]}\n21- {strings[21]}\n22- {strings[22]}\n23- {strings[23]}\n24- {strings[24]}\n" +
+        //             $"25- {strings[25]}\n26- {strings[26]}\n27- {strings[27]}\n28- {strings[28]}\n29- {strings[29]}\n";
         strings[2] = $"Vertical: {MyApprox(verticalInput)}; Horizontal: {MyApprox(horizontalInput)}, IsBreaking: {isBreaking};";
         strings[11] = $"PreviousPosition: {ToStringVector3(previousPosition)}";
         strings[12] = $"MyPosition: {ToStringVector3(transform.position)}";
@@ -115,16 +115,16 @@ public class CarController : MonoBehaviour
 
     private void GetSpeed(Vector3 position)
     {
-        speed = 3.6f * (1f / Time.deltaTime) * (float)Math.Sqrt(
+        Speed = 3.6f * (1f / Time.deltaTime) * (float)Math.Sqrt(
             (previousPosition.x - position.x) * (previousPosition.x - position.x) +
             (previousPosition.y - position.y) * (previousPosition.y - position.y) +
             (previousPosition.z - position.z) * (previousPosition.z - position.z));
         // Cadrant.sprite = Sprites[0];
-        if (speed < 1f && speed > 0.5f)
+        if (Speed < 1f && Speed > 0.5f)
             speedText.text = $"1";
         else
-            speedText.text = ((int)speed).ToString();
-        var n = (int)speed / (isGoingForward ? 3 : 1);
+            speedText.text = ((int)Speed).ToString();
+        var n = (int)Speed / (isGoingForward ? 3 : 1);
         Cadrant.sprite = Sprites[n >= 16 ? 15 : n];
 
         var colorA = StopImage.color.a;
@@ -172,14 +172,14 @@ public class CarController : MonoBehaviour
 
     private void HandleMotor() // avancer / reculer
     {
-        var b = verticalInput > 0.1f && speed > 45.9f && isGoingForward || verticalInput < 0.1f && speed > 15.5f && !isGoingForward; // si on dépasse 45 en avançant ou 15 en reculant, la voiture s'arrête
-        var motorTorque = (b ? 0 : verticalInput * motorForce) - 0.2f * speed * (speed + 10f) * (isGoingForward ? 1 : -1);
+        var b = verticalInput > 0.1f && Speed > 45.9f && isGoingForward || verticalInput < 0.1f && Speed > 15.5f && !isGoingForward; // si on dépasse 45 en avançant ou 15 en reculant, la voiture s'arrête
+        var motorTorque = (b ? 0 : verticalInput * motorForce) - 0.2f * Speed * (Speed + 10f) * (isGoingForward ? 1 : -1);
         frontLeftWheelCollider.motorTorque = motorTorque * 0.5f;
         frontRightWheelCollider.motorTorque = motorTorque * 0.5f;
         rearLeftWheelCollider.motorTorque = motorTorque;
         rearRightWheelCollider.motorTorque = motorTorque;
         
-        if (speed is >= -0.1f and <= 0.5f && verticalInput == 0f)
+        if (Speed is >= -0.1f and <= 0.5f && verticalInput == 0f)
             isBreaking = true;
         frontLeftWheelCollider.brakeTorque = isBreaking ? brakeForce : 0f;
         frontRightWheelCollider.brakeTorque = isBreaking ? brakeForce : 0f;
@@ -198,18 +198,17 @@ public class CarController : MonoBehaviour
 
     private void UpdateWheelPos(WheelCollider wheelCollider, Transform trans)
     {
-        Vector3 pos;
-        Quaternion rot;
-        wheelCollider.GetWorldPose(out pos, out rot);
+        wheelCollider.GetWorldPose(out var pos, out var rot);
         trans.rotation = rot;
         strings[1] = $"X:{MyApprox(rot.x)}; Y:{MyApprox(rot.y)}; Z:{MyApprox(rot.z)}";
         trans.position = pos;
     }
 
-    private float MyApprox(float x) => (int)(x * 100f) / 100f;
-    private double MyTan(double a) => Math.Tan(Math.PI * a / 180d);
-    private double MyAtan(double a) => Math.Atan(a) * 180d / Math.PI;
-    private double MyAcos(double a) => Math.Acos(a * Math.PI / 180d) * 180d / Math.PI;
-    private string ToStringVector3(Vector3 vector1) => $"X: {MyApprox(vector1.x)}; Y: {MyApprox(vector1.y)}; Z: {MyApprox(vector1.z)};";
-    private double Norme(Vector3 v) => Math.Sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+
+    private static float MyApprox(float x) => (int)(x * 100f) / 100f;
+    private static double MyTan(double a) => Math.Tan(Math.PI * a / 180d);
+    private static double MyAtan(double a) => Math.Atan(a) * 180d / Math.PI;
+    private static double MyAcos(double a) => Math.Acos(a * Math.PI / 180d) * 180d / Math.PI;
+    private static string ToStringVector3(Vector3 vector1) => $"X: {MyApprox(vector1.x)}; Y: {MyApprox(vector1.y)}; Z: {MyApprox(vector1.z)};";
+    private static double Norme(Vector3 v) => Math.Sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 }
