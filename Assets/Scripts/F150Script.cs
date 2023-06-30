@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -12,7 +13,17 @@ public class F150Script : MonoBehaviour
     public GameObject target;
     public Vector3 previousPosition;
     public float Speed { get; set; }
-    
+
+    public int CoverWay(int index)
+    {
+        return transform.position.x switch
+        {
+            <= 501.1f => 0,
+            <= 504.6f => 1,
+            <= 509.1f => 2,
+            _ => 3
+        };
+    }
     
     public WheelCollider frontLeftWheelCollider;
     public WheelCollider frontRightWheelCollider;
@@ -50,13 +61,29 @@ public class F150Script : MonoBehaviour
         UpdateWheels();
         UpdateSpeed();
     }
+
+    private static int GetColumn(float a) => a switch { < 501.5f => 0, > 510.5f => 2, _ => 1 };
+
+    private float GetPositionX(float x)
+    {
+        return GetColumn(x) switch
+        {
+            0 => 501.5f,
+            1 => x,
+            _ => 510.5f
+        };
+    } 
     
     private void GetInput()
     {
-        horizontalInput = 0;
         verticalInput = 1;
         isBreaking = Input.GetKey(KeyCode.Space);
-        // isBreaking = false;
+        horizontalInput = (GetPositionX(target.transform.position.x) - transform.position.x) / 9f; // - transform.rotation.y / 30f;
+
+        var vectorC = target.transform.position - transform.position;
+        horizontalInput = (float)MyAtan(vectorC.x / vectorC.z);
+//        print(horizontalInput + "  " + transform.rotation.y+ "  vitesse: " + this.gameObject.GetComponent<Rigidbody>().velocity);
+
     }
     
     
@@ -79,7 +106,7 @@ public class F150Script : MonoBehaviour
     
     private void HandleSteering() // tourner
     {
-        steerAngle = maxSteeringAngle * horizontalInput; // + horizontalInput * 0.6f * Speed;
+        steerAngle = maxSteeringAngle * horizontalInput;
         switch (horizontalInput)
         {
             case < -0.1f:
@@ -114,14 +141,55 @@ public class F150Script : MonoBehaviour
 
     private void UpdateSpeed()
     {
-        Speed = (float)Norme(transform.position - previousPosition) * Time.deltaTime;
+        Speed = (float)Norme(transform.position - previousPosition) * (1f / Time.deltaTime) * 3.6f;
         previousPosition = transform.position;
-        speedTMP.text = $"F150 Speed: {MyApprox(Speed)}";
+        // speedTMP.text = $"F150 Speed: {(int)Speed}     way: {target.GetComponent<CarController>().WhichWay} ";
     }
-    
-    
-    
-    
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (IsBuilding(other.gameObject.name))
+        {
+            // Destroy(other.gameObject.GetComponent<Collider>());
+            transform.Translate(transform.position.x < 505.5f ? 1 : -1 * Time.deltaTime,0f, 0f);
+        }
+        
+        // if (IsOfType(other, out CarController carController))
+        // {
+        //     carController.IsDestroyed = true;
+        //     Debug.Log("car destroyed");
+        // }
+    }
+
+    private void OnCollisionStay(Collision other)
+    {
+        print("hehey");
+        if (IsBuilding(other.gameObject.name))
+        {
+            transform.Translate(transform.position.x < 505.5f ? 1 : -1 * Time.deltaTime, 0f, 0f);
+        }
+    }
+
+    private static bool IsBuilding(string s)
+    {
+        // print("collider -" + s + "-");
+        return s == "collider";
+        // return s.Length >= 4 && s.Substring(0, 4) == "coll";
+    }
+
+    public static bool IsOfType<T>(Collision obj, out T k)
+    {
+        try
+        {
+            k = obj.gameObject.GetComponent<T>();
+            return true;
+        }
+        catch (Exception)
+        {
+            k = default;
+            return false;
+        }
+    }
     private float MyApprox(float x) => (int)(x * 100f) / 100f;
     private double MyTan(double a) => Math.Tan(Math.PI * a / 180d);
     private double MyAtan(double a) => Math.Atan(a) * 180d / Math.PI;

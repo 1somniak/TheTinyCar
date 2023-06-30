@@ -16,9 +16,10 @@ public class CarController : MonoBehaviour
     private bool isBreaking;
     public float Battery;
     public bool IsDestroyed { get; set; }
+    public JoyScript JoyScript;
     
 
-    private bool _isGoingForward
+    private bool IsGoingForward
     {
         get
         {
@@ -28,11 +29,24 @@ public class CarController : MonoBehaviour
             var AC = Norme(myPosition - CPosition); // vecteur fixe
             var BC = Norme(previousPosition - CPosition); // hypotenuse
             strings[16] = $"AB: {MyApprox((float)AB)}; AC: {MyApprox((float)AC)}; BC: {MyApprox((float)BC)};";
-            // var theta = (MyAcos((-BC * BC + AB * AB + AC * AC) / (2 * AB * AC)) + 360) % 360;
             return BC * BC >= AB * AB + AC * AC;
         }
     }
     public bool isGoingForward;
+
+    public int WhichWay
+    {
+        get
+        {
+            return transform.position.x switch
+            {
+                <= 501.1f => 0,
+                <= 505.1f => 1,
+                <= 510.1f => 2,
+                _         => 3
+            };
+        }
+    }
 
     public Vector3 previousPosition;
     public float Speed { get; private set; }
@@ -48,6 +62,7 @@ public class CarController : MonoBehaviour
     public Transform rearLeftWheelTransform;
     public Transform rearRightWheelTransform;
     public GameObject cube;
+    public GameObject carVisual;
 
     public float maxSteeringAngle = 30f;
     public float motorForce = 50f;
@@ -72,7 +87,7 @@ public class CarController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        isGoingForward = _isGoingForward;
+        isGoingForward = IsGoingForward;
         GetInput();
         HandleMotor();
         HandleSteering();
@@ -81,11 +96,12 @@ public class CarController : MonoBehaviour
         GetSpeed(position);
         ChangeStrings();
         previousPosition = position;
+        DestroyVehicle();
     }
 
     private void ChargeBattery()
     {
-        Battery = 1000000f; // 1m
+        Battery = 1000000f; // 1 Million
     }
     
     private void ChangeStrings()
@@ -115,10 +131,7 @@ public class CarController : MonoBehaviour
 
     private void GetSpeed(Vector3 position)
     {
-        Speed = 3.6f * (1f / Time.deltaTime) * (float)Math.Sqrt(
-            (previousPosition.x - position.x) * (previousPosition.x - position.x) +
-            (previousPosition.y - position.y) * (previousPosition.y - position.y) +
-            (previousPosition.z - position.z) * (previousPosition.z - position.z));
+        Speed = 3.6f * (1f / Time.deltaTime) * (float)Norme(previousPosition - position);
         // Cadrant.sprite = Sprites[0];
         if (Speed < 1f && Speed > 0.5f)
             speedText.text = $"1";
@@ -142,8 +155,16 @@ public class CarController : MonoBehaviour
 
     private void GetInput()
     {
-        horizontalInput = Input.GetAxis("Horizontal");
-        verticalInput = Input.GetAxis("Vertical");
+        horizontalInput = Input.GetAxis("Horizontal") + JoyScript.Horizontal;
+        if (horizontalInput > 1)
+            horizontalInput = 1;
+        if (horizontalInput < -1)
+            horizontalInput = -1;
+        verticalInput = Input.GetAxis("Vertical") + JoyScript.Vertical;
+        if (verticalInput > 1)
+            verticalInput = 1;
+        if (verticalInput < -1)
+            verticalInput = -1;
         // isBreaking = Input.GetKey(KeyCode.Space);
         isBreaking = verticalInput < -0.1f && isGoingForward || verticalInput > 0.1f && !isGoingForward;
     }
@@ -202,6 +223,26 @@ public class CarController : MonoBehaviour
         trans.rotation = rot;
         strings[1] = $"X:{MyApprox(rot.x)}; Y:{MyApprox(rot.y)}; Z:{MyApprox(rot.z)}";
         trans.position = pos;
+    }
+
+    private void DestroyVehicle()
+    {
+        if (!IsDestroyed) return;
+        transform.rotation = Quaternion.Euler(0f, transform.rotation.y, 0f);
+        foreach (var boxCollider in this.GetComponents<BoxCollider>())
+            boxCollider.enabled = false;
+        carVisual.transform.Find("Cube0").gameObject.GetComponent<BoxCollider>().enabled = false;
+        carVisual.transform.Find("Cube0").gameObject.GetComponent<BoxCollider>().enabled = false;
+        carVisual.transform.position = new Vector3(transform.position.x, 0, transform.position.z);
+        isBreaking = true;
+        var localScale = carVisual.transform.localScale;
+        if (localScale.y > 0.01f)
+            carVisual.transform.localScale = new Vector3(localScale.x, 
+                                             localScale.y - 2 * Time.deltaTime,
+                                               localScale.z);
+        localScale = carVisual.transform.localScale;
+        if (localScale.y <= 0f)
+            carVisual.transform.localScale = new Vector3(1, 0.01f, 1);
     }
 
 

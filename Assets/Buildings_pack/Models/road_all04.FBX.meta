@@ -1,0 +1,185 @@
+fileFormatVersion: 2
+guid: 24dfe6d3c1d4e6945881151a06935dbb
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: holder
+    100002: lantern
+    100004: light
+    100006: pedestrian light
+    100008: pillar
+    100010: road_+
+    100012: road_+_1
+    100014: road_+_2
+    100016: road_+_3
+    100018: road_+_4
+    100020: //RootNode
+    100022: road_I
+    100024: road_I_1
+    100026: road_I_2
+    100028: road_r
+    100030: road_r_1
+    100032: road_r_2
+    100034: road_T
+    100036: road_T_1
+    100038: road_T_2
+    100040: road_T_3
+    100042: sidewalk
+    100044: sidewalk2
+    100046: traffic lights
+    400000: holder
+    400002: lantern
+    400004: light
+    400006: pedestrian light
+    400008: pillar
+    400010: road_+
+    400012: road_+_1
+    400014: road_+_2
+    400016: road_+_3
+    400018: road_+_4
+    400020: //RootNode
+    400022: road_I
+    400024: road_I_1
+    400026: road_I_2
+    400028: road_r
+    400030: road_r_1
+    400032: road_r_2
+    400034: road_T
+    400036: road_T_1
+    400038: road_T_2
+    400040: road_T_3
+    400042: sidewalk
+    400044: sidewalk2
+    400046: traffic lights
+    2300000: holder
+    2300002: lantern
+    2300004: light
+    2300006: pedestrian light
+    2300008: pillar
+    2300010: road_+
+    2300012: road_+_1
+    2300014: road_+_2
+    2300016: road_+_3
+    2300018: road_+_4
+    2300020: road_I
+    2300022: road_I_1
+    2300024: road_I_2
+    2300026: road_r
+    2300028: road_r_1
+    2300030: road_r_2
+    2300032: road_T
+    2300034: road_T_1
+    2300036: road_T_2
+    2300038: road_T_3
+    2300040: sidewalk
+    2300042: sidewalk2
+    2300044: traffic lights
+    3300000: holder
+    3300002: lantern
+    3300004: light
+    3300006: pedestrian light
+    3300008: pillar
+    3300010: road_+
+    3300012: road_+_1
+    3300014: road_+_2
+    3300016: road_+_3
+    3300018: road_+_4
+    3300020: road_I
+    3300022: road_I_1
+    3300024: road_I_2
+    3300026: road_r
+    3300028: road_r_1
+    3300030: road_r_2
+    3300032: road_T
+    3300034: road_T_1
+    3300036: road_T_2
+    3300038: road_T_3
+    3300040: sidewalk
+    3300042: sidewalk2
+    3300044: traffic lights
+    4300000: pillar
+    4300002: road_I
+    4300004: road_r
+    4300006: road_+
+    4300008: road_T
+    4300010: lantern
+    4300012: traffic lights
+    4300014: pedestrian light
+    4300016: holder
+    4300018: light
+    4300020: sidewalk
+    4300022: sidewalk2
+    4300024: road_I_1
+    4300026: road_I_2
+    4300028: road_r_1
+    4300030: road_r_2
+    4300032: road_+_1
+    4300034: road_+_2
+    4300036: road_+_3
+    4300038: road_+_4
+    4300040: road_T_1
+    4300042: road_T_2
+    4300044: road_T_3
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: .100000001
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 0
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
