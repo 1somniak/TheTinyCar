@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 521230271}
   - component: {fileID: 443638675}
   - component: {fileID: 443638674}
+  - component: {fileID: 8919154642637265042}
+  - component: {fileID: 3156635416604876698}
   m_Layer: 0
   m_Name: TreeBox
   m_TagString: Untagged
@@ -83,3 +85,30 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!136 &8919154642637265042
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 443638673}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.08
+  m_Height: 1.31
+  m_Direction: 1
+  m_Center: {x: 0.02, y: 0.64, z: 0}
+--- !u!65 &3156635416604876698
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 443638673}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.95, y: 1.79, z: 1.47}
+  m_Center: {x: 0.02, y: 2.2, z: 0.25}

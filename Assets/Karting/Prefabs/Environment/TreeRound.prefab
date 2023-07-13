@@ -92,6 +92,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5043517943713643291}
+  - component: {fileID: 3708302861051402960}
+  - component: {fileID: 9004975939769317944}
+  - component: {fileID: 5353794297271553566}
+  - component: {fileID: 6592983653598529922}
   m_Layer: 0
   m_Name: TreeRound
   m_TagString: Untagged
@@ -115,3 +119,59 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &3708302861051402960
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5043517944903718146}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.08
+  m_Height: 2.8
+  m_Direction: 1
+  m_Center: {x: 0, y: 1.38, z: 0.29}
+--- !u!136 &9004975939769317944
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5043517944903718146}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 1.19
+  m_Height: 0
+  m_Direction: 1
+  m_Center: {x: -0.12, y: 3.9, z: 0.22}
+--- !u!136 &5353794297271553566
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5043517944903718146}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.69
+  m_Height: 1.48
+  m_Direction: 1
+  m_Center: {x: -0.68, y: 2.85, z: 1.04}
+--- !u!136 &6592983653598529922
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5043517944903718146}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.51
+  m_Height: 0
+  m_Direction: 1
+  m_Center: {x: 0.55, y: 2.34, z: 0.37}
