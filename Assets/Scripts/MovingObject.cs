@@ -31,15 +31,18 @@ public class MovingObject : MonoBehaviour
         {
             Debug.Log("raycast est touché mdr");
         }
+        HandleMotor();
         UpdateWheelsPos();
     }
 
+    public void Build(float _speed, int? _way = null) => (speed, way) = (_speed, _way ?? 0);
+    
     private void HandleMotor()
     {
-        if (ActualSpeed < speed && IsMovingObjectForward())
-        {
-            
-        } // 453.49 - 96.39 = 357.1
+        var a = ActualSpeed < speed && !IsMovingObjectForward();
+        for (var i = 0; i < 4; i++)
+            wheelColliders[i].motorTorque = a ? _motorForce : -_motorForce;
+        print(a);
     }
     
     

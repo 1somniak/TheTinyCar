@@ -17,8 +17,8 @@ public class JoyScript : MonoBehaviour, IPointerDownHandler, IDragHandler
     public bool onDisplay;
     public float backgroundWidth;
     public Vector2 direction;
-    public float Vertical => direction.y < 10 ? 0 : direction.y / 100f;
-    public float Horizontal => direction.x < 10 ? 0 : direction.x / 100f;
+    public float Vertical => direction.y / 100f;
+    public float Horizontal => direction.x / 100f;
 
     void Start()
     {
