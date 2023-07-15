@@ -34,20 +34,6 @@ public class CarController : MonoBehaviour
     }
     public bool isGoingForward;
 
-    public int WhichWay
-    {
-        get
-        {
-            return transform.position.x switch
-            {
-                <= 501.1f => 0,
-                <= 505.1f => 1,
-                <= 510.1f => 2,
-                _         => 3
-            };
-        }
-    }
-
     public Vector3 previousPosition;
     public float Speed { get; private set; }
     public double carWidth = 130d;
@@ -65,8 +51,8 @@ public class CarController : MonoBehaviour
     public GameObject carVisual;
 
     public float maxSteeringAngle = 30f;
-    public float motorForce = 50f;
-    public float brakeForce = 0f;
+    public float motorForce = 1500f;
+    public float brakeForce = 500;
 
     public Sprite[] Sprites;
     public Image Cadrant;
@@ -75,35 +61,122 @@ public class CarController : MonoBehaviour
     public TMP_Text Dbug;
     private List<string> strings = new(new[] { "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" }); // 30
     public TMP_Text speedText;
+    private float _scale;
+    private Rigidbody _rigidbody;
+    public float MyTime { get; private set; } // temps écoulé
     
+    // battery
+    public List<Image> batteryBars;
+    public List<Sprite> roundSquares;
+    private float _maxBattery;
+    private List<Color> _colorBattery;
+    public TMP_Text batteryPercentage;
+    
+    // distance
+    public float distanceReached;
+    public Vector3 startPoint;
+    public Image gradient;
+    public Image gradientMask;
+    private float _gradientInitialX;
+    private float _gradientDeltaMove;
+    public TMP_Text distanceText;
+
     private void Start()
     {
-        Time.fixedDeltaTime = 1f / 60;
         transform.rotation = Quaternion.Euler(0, 0f, 0);
         previousPosition = transform.position;
+        _maxBattery = 1000f;
         ChargeBattery();
         IsDestroyed = false;
+        _scale = (transform.localScale.x + transform.localScale.y + transform.localScale.z) / 3;
+        _rigidbody = this.GetComponent<Rigidbody>();
+        _colorBattery = new List<Color>(new[] { 
+            Color.red,
+            Color.red, 
+            new Color(192, 64, 0), 
+            new Color(128, 128, 0),
+            new Color(64, 192, 0), 
+            Color.green });
+        batteryPercentage.text = "100%";
+        distanceReached = 0;
+        startPoint = transform.position;
+        _gradientInitialX = gradient.transform.position.x;
+        _gradientDeltaMove = gradient.rectTransform.sizeDelta.x / 2 - gradientMask.rectTransform.sizeDelta.x / 2;
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         isGoingForward = IsGoingForward;
         GetInput();
         HandleMotor();
+        Battery -= 50f * Time.deltaTime;
         HandleSteering();
         UpdateWheels();
         var position = transform.position;
         GetSpeed(position);
         ChangeStrings();
+        ChangeBatteryBars();
         previousPosition = position;
         DestroyVehicle();
+        EditDistance();
+        MyTime += Time.deltaTime;
     }
 
-    private void ChargeBattery()
+    public void EditDistance()
     {
-        Battery = 1000000f; // 1 Million
+        gradient.transform.position = new Vector2(
+            _gradientInitialX + _gradientDeltaMove * (float)Math.Sin(MyTime / 5), 
+            gradient.transform.position.y);
+        var d = transform.position.z - startPoint.z;
+        if (d > distanceReached)
+        {
+            distanceReached = d;
+            d *= 3.6f;
+            distanceText.text = $"{(int)d},{(int)((d - (int)d) * 10f)}m";
+        }
     }
-    
+
+    public void ChargeBattery()
+    {
+        Battery = _maxBattery;
+    }
+
+    private void ChangeBatteryBars()
+    {
+        var numberOfBars = (Battery / _maxBattery) switch
+        {
+            > 0.8f => 5,
+            > 0.6f => 4,
+            > 0.4f => 3,
+            > 0.2f => 2,
+            > 0f => 1,
+            _ => 0
+        };
+        for (var i = 0; i < 5; i++)
+        {
+            if (i == 0)
+                batteryBars[i].sprite = numberOfBars > 1 ? roundSquares[0] : roundSquares[3];
+            else if (i == numberOfBars - 1)
+                batteryBars[i].sprite = roundSquares[2];
+            else
+                batteryBars[i].sprite = roundSquares[1];
+
+            if (i < numberOfBars)
+            {
+                batteryBars[i].enabled = true;
+                batteryBars[i].color = _colorBattery[numberOfBars];
+            }
+            else
+                batteryBars[i].enabled = false;
+        }
+
+        if (Battery <= 0)
+            batteryPercentage.text = "0%";
+        else if (Battery >= _maxBattery)
+            batteryPercentage.text = "100%";
+        else
+            batteryPercentage.text = $"{(int)(100f * Battery / _maxBattery)}%";
+    }
     private void ChangeStrings()
     {
         strings[10] = $"                       {MyApprox(Speed)}";
@@ -122,21 +195,19 @@ public class CarController : MonoBehaviour
         strings[8] = $"IsGoingForward: {isGoingForward}";
     }
     
-    private void Update()
-    {
-        strings[4] = $"FPS: {MyApprox(1f / Time.deltaTime)}";
-        if (Input.GetKeyDown(KeyCode.Delete))
-            Start();
-    }
-
     private void GetSpeed(Vector3 position)
     {
-        Speed = 3.6f * (1f / Time.deltaTime) * (float)Norme(previousPosition - position);
-        // Cadrant.sprite = Sprites[0];
-        if (Speed < 1f && Speed > 0.5f)
+        // Speed = 3.6f * (1f / Time.deltaTime) * (float)Norme(previousPosition - position);
+        Speed = _rigidbody.velocity.magnitude * 3.6f;
+        if (Speed is > 0.5f and < 1f)
             speedText.text = $"1";
         else
-            speedText.text = ((int)Speed).ToString();
+        {
+            if (isGoingForward)
+                speedText.text = Speed is >= 45f and <= 47f ? "45" : ((int)Speed).ToString();
+            else
+                speedText.text = Speed is >= 15f and <= 17f ? "15" : ((int)Speed).ToString();
+        }
         var n = (int)Speed / (isGoingForward ? 3 : 1);
         Cadrant.sprite = Sprites[n >= 16 ? 15 : n];
 
@@ -158,13 +229,15 @@ public class CarController : MonoBehaviour
         horizontalInput = Input.GetAxis("Horizontal") + JoyScript.Horizontal;
         if (horizontalInput > 1)
             horizontalInput = 1;
-        if (horizontalInput < -1)
+        else if (horizontalInput < -1)
             horizontalInput = -1;
         verticalInput = Input.GetAxis("Vertical") + JoyScript.Vertical;
         if (verticalInput > 1)
             verticalInput = 1;
-        if (verticalInput < -1)
+        else if (verticalInput < -1)
             verticalInput = -1;
+        if (Battery <= 0)
+            verticalInput = 0;
         // isBreaking = Input.GetKey(KeyCode.Space);
         isBreaking = verticalInput < -0.1f && isGoingForward || verticalInput > 0.1f && !isGoingForward;
     }
@@ -193,8 +266,19 @@ public class CarController : MonoBehaviour
 
     private void HandleMotor() // avancer / reculer
     {
+        if (transform.position.y < -0.5f) // si la voiture passe sous le terrain;
+        {
+            print("Sous la map !");
+            transform.position -= new Vector3(0, transform.position.y, 0);
+            _rigidbody.velocity -= new Vector3(0, _rigidbody.velocity.y, 0);
+            transform.rotation = Quaternion.Euler(0, 0, 0);
+        }
+        
         var b = verticalInput > 0.1f && Speed > 45.9f && isGoingForward || verticalInput < 0.1f && Speed > 15.5f && !isGoingForward; // si on dépasse 45 en avançant ou 15 en reculant, la voiture s'arrête
         var motorTorque = (b ? 0 : verticalInput * motorForce) - 0.2f * Speed * (Speed + 10f) * (isGoingForward ? 1 : -1);
+
+        if (verticalInput < -0.1f && Speed < 2f)
+            motorTorque = verticalInput * motorTorque;
         frontLeftWheelCollider.motorTorque = motorTorque * 0.5f;
         frontRightWheelCollider.motorTorque = motorTorque * 0.5f;
         rearLeftWheelCollider.motorTorque = motorTorque;

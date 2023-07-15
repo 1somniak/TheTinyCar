@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class MovingObject : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class MovingObject : MonoBehaviour
     private float ActualSpeed => myRigidBody.velocity.magnitude * 3.6f;
     public int raycastDistance = 100;
     private float _motorForce = 10000;
+    public GameObject car;
+    public List<BoxCollider> myColliders;
 
     private void Start()
     {
@@ -33,9 +36,11 @@ public class MovingObject : MonoBehaviour
         }
         HandleMotor();
         UpdateWheelsPos();
+        EnableColliders();
     }
 
-    public void Build(float _speed, int? _way = null) => (speed, way) = (_speed, _way ?? 0);
+    public void Build(float _speed, int? _way = null) =>
+        (speed, way, car) = (_speed, _way ?? 1, GameObject.FindGameObjectWithTag("Player"));
     
     private void HandleMotor()
     {
@@ -60,12 +65,27 @@ public class MovingObject : MonoBehaviour
     {
         if (!Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, raycastDistance))
             return false;
-        else
-            return hit.transform.name.Length >= 4 &&
-                   hit.transform.name.Substring(0, 4) is "Bus_" or "Car_" or "Poli" or "Taxi";
+        return hit.transform.name.Length >= 4 &&
+               hit.transform.name.Substring(0, 4) is "Bus_" or "Car_" or "Poli" or "Taxi";
     }
 
     private bool IsBusCarTaxiPolice(string s) => s.Length >= 4 && s.Substring(0, 4) is "Bus_" or "Car_" or "Poli" or "Taxi";
 
     private float Norm(Vector3 v) => (float)Math.Sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+
+    private void EnableColliders()
+    {
+        if (car is null)
+        {
+            foreach (var boxCollider in myColliders)
+                boxCollider.enabled = true;
+        }
+        else
+        {
+            foreach (var boxCollider in myColliders)
+                boxCollider.enabled = Vector3.Distance(transform.position, car.transform.position) < 20f;
+        }
+    }
+    
+    
 }
